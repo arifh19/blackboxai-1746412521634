@@ -1,6 +1,5 @@
 import React from 'react';
 import ReactPaginate from 'react-paginate';
-import 'sweetpagination/dist/sweetpagination.css';
 
 const Pagination = ({ totalPages, currentPage, onPageChange }) => {
   if (!totalPages || totalPages < 2) {
