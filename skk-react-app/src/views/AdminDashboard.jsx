@@ -1,11 +1,10 @@
-import React, { useContext, useState } from 'react';
-import { AuthContext } from '../auth/AuthContext';
+import React, { useState } from 'react';
 import DashboardSidebar from '../components/DashboardSidebar';
 import { useNavigate } from 'react-router-dom';
-import { adminMenuItems } from '../navigation/menuConfig';
+import { useMenu } from '../navigation/menuManager';
 
 const AdminDashboard = () => {
-  const { user, logoutUser } = useContext(AuthContext);
+  const { user, logoutUser, filteredMenuItems } = useMenu('admin');
   const navigate = useNavigate();
   const [profileMenuOpen, setProfileMenuOpen] = useState(false);
 
@@ -21,18 +20,6 @@ const AdminDashboard = () => {
   const handleChangePassword = () => {
     navigate('/change-password');
   };
-
-  const menuItems = adminMenuItems;
-
-  // Check if user has ability to access a subject
-  const canAccess = (subject) => {
-    if (!user || !user.ability) return false;
-    return user.ability.some(
-      (a) => (a.action === 'manage' && a.subject === 'all') || (a.action === 'read' && a.subject === subject)
-    );
-  };
-
-  const filteredMenuItems = menuItems.filter((item) => canAccess(item.subject));
 
   return (
     <div className="flex min-h-screen bg-gray-100">
