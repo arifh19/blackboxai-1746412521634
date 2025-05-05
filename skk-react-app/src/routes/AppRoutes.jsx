@@ -67,32 +67,20 @@ const AppRoutes = () => {
           }
         />
 
-        <Route
-          path="/daftar-lsp"
-          element={
-            <ProtectedRoute requiredSubject="daftarLSP">
-              <DaftarLSP />
-            </ProtectedRoute>
-          }
-        />
+        <Route path="/daftar-lsp" element={<DaftarLSP />} />
+        <Route path="/daftar-asosiasi" element={<DaftarAsosiasi />} />
+        <Route path="/daftar-lembaga-diklat" element={<DaftarLembagaDiklat />} />
 
-        <Route
-          path="/daftar-asosiasi"
-          element={
-            <ProtectedRoute requiredSubject="daftarAsosiasi">
-              <DaftarAsosiasi />
-            </ProtectedRoute>
-          }
-        />
-
-        <Route
-          path="/daftar-lembaga-diklat"
-          element={
-            <ProtectedRoute requiredSubject="daftarLembagaDiklat">
-              <DaftarLembagaDiklat />
-            </ProtectedRoute>
-          }
-        />
+        <Route path="/regulasi-internal" element={<RegulasiInternal />} />
+        <Route path="/regulasi-eksternal" element={<RegulasiEksternal />} />
+        <Route path="/pengajuan-skkk" element={<PengajuanSKKK />} />
+        <Route path="/pengajuan-skki" element={<PengajuanSKKI />} />
+        <Route path="/pengajuan-skkni" element={<PengajuanSKKNI />} />
+        <Route path="/pengajuan-lsp" element={<PengajuanLSP />} />
+        <Route path="/dokumen" element={<Dokumen />} />
+        <Route path="/galeri" element={<Galeri />} />
+        <Route path="/berita" element={<Berita />} />
+        <Route path="/hubungi-kami" element={<HubungiKami />} />
 
         <Route path="*" element={<Navigate to="/login" replace />} />
       </Routes>
