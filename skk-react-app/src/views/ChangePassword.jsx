@@ -24,7 +24,7 @@ const ChangePassword = () => {
     }
 
     try {
-      const response = await fetch(`${backendUrl}/auth/password`, {
+      const response = await fetch(`${backendUrl}/users/password`, {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
