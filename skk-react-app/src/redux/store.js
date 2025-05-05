@@ -1,13 +1,11 @@
 import { configureStore } from '@reduxjs/toolkit';
-
-// Placeholder for slices
-// import authReducer from './auth/authSlice';
-// import newsReducer from './news/newsSlice';
+import authReducer from './authSlice';
+import navigationReducer from './navigationSlice';
 
 const store = configureStore({
   reducer: {
-    // auth: authReducer,
-    // news: newsReducer,
+    auth: authReducer,
+    navigation: navigationReducer,
   },
 });
 
