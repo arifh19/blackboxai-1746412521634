@@ -1,6 +1,8 @@
 import React, { useContext, useState } from 'react';
 import { AuthContext } from '../auth/AuthContext';
+import DashboardSidebar from '../components/DashboardSidebar';
 import { useNavigate } from 'react-router-dom';
+import { adminMenuItems } from '../navigation/menuConfig';
 
 const AdminDashboard = () => {
   const { user, logoutUser } = useContext(AuthContext);
@@ -20,12 +22,7 @@ const AdminDashboard = () => {
     navigate('/change-password');
   };
 
-  // Example menu items with subjects for ability check
-  const menuItems = [
-    { name: 'Dashboard', path: '/admin-dashboard', subject: 'dashboard' },
-    { name: 'User Management', path: '/admin/users', subject: 'users' },
-    { name: 'Settings', path: '/admin/settings', subject: 'settings' },
-  ];
+  const menuItems = adminMenuItems;
 
   // Check if user has ability to access a subject
   const canAccess = (subject) => {
@@ -35,26 +32,12 @@ const AdminDashboard = () => {
     );
   };
 
+  const filteredMenuItems = menuItems.filter((item) => canAccess(item.subject));
+
   return (
     <div className="flex min-h-screen bg-gray-100">
-      {/* Sidebar */}
-      <nav className="w-64 bg-white shadow-md">
-        <div className="p-6 font-bold text-xl border-b">Admin Panel</div>
-        <ul className="mt-4">
-          {menuItems.map(
-            (item) =>
-              canAccess(item.subject) && (
-                <li key={item.path} className="px-6 py-3 hover:bg-gray-200 cursor-pointer">
-                  <a href={item.path}>{item.name}</a>
-                </li>
-              )
-          )}
-        </ul>
-      </nav>
-
-      {/* Main content */}
+      <DashboardSidebar menuItems={filteredMenuItems} />
       <div className="flex-1 p-6">
-        {/* Top bar */}
         <div className="flex justify-end mb-6 relative">
           <button
             onClick={toggleProfileMenu}
@@ -88,8 +71,6 @@ const AdminDashboard = () => {
             </div>
           )}
         </div>
-
-        {/* Dashboard content */}
         <h1 className="text-3xl font-bold mb-4">Welcome, {user ? user.fullName : 'Admin'}</h1>
         <p>This is your admin dashboard.</p>
       </div>
