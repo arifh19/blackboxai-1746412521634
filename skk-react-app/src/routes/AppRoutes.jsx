@@ -8,6 +8,7 @@ import ChangePassword from '../views/ChangePassword';
 import DaftarLSP from '../views/DaftarLSP';
 import DaftarAsosiasi from '../views/DaftarAsosiasi';
 import DaftarLembagaDiklat from '../views/DaftarLembagaDiklat';
+import Home from '../views/Home';
 
 const ProtectedRoute = ({ children, requiredSubject }) => {
   const { user, loading } = useContext(AuthContext);
@@ -36,6 +37,7 @@ const AppRoutes = () => {
   return (
     <Router>
       <Routes>
+        <Route path="/" element={<Home />} />
         <Route path="/login" element={<Login />} />
 
         <Route
