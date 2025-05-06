@@ -10,6 +10,7 @@ const DaftarLSP = () => {
   const [data, setData] = useState([]);
   const [filteredData, setFilteredData] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
+  const [filterKategori, setFilterKategori] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -33,12 +34,15 @@ const DaftarLSP = () => {
   }, []);
 
   useEffect(() => {
-    const filtered = data.filter((item) =>
-      item.name.toLowerCase().includes(searchTerm.toLowerCase())
-    );
+    const filtered = data.filter((item) => {
+      return (
+        (filterKategori === '' || item.kategori === filterKategori) &&
+        (searchTerm === '' || item.name.toLowerCase().includes(searchTerm.toLowerCase()))
+      );
+    });
     setFilteredData(filtered);
     setCurrentPage(1);
-  }, [searchTerm, data]);
+  }, [searchTerm, filterKategori, data]);
 
   const totalPages = Math.ceil(filteredData.length / ITEMS_PER_PAGE);
   const currentData = filteredData.slice(
@@ -57,13 +61,24 @@ const DaftarLSP = () => {
         <h2>DAFTAR LSP</h2>
       </header>
 
-      <section className="filter-section">
+      <section className="filter-section flex space-x-4 mb-4">
+        <select
+          id="filter-kategori"
+          value={filterKategori}
+          onChange={(e) => setFilterKategori(e.target.value)}
+          className="border p-2 rounded"
+        >
+          <option value="">-- Semua Kategori --</option>
+          <option value="P1">P1</option>
+          <option value="P2">P2</option>
+          <option value="P3">P3</option>
+        </select>
         <input
           type="text"
           placeholder="Cari nama LSP..."
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
-          className="border p-2 rounded mb-4 w-1/3"
+          className="border p-2 rounded flex-1"
         />
       </section>
 
