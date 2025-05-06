@@ -4,6 +4,7 @@ import DashboardSidebar from '../../components/DashboardSidebar';
 import { useMenu } from '../../navigation/menuManager';
 import Pagination from '../../components/Pagination';
 import { AuthContext } from '../../auth/AuthContext';
+import { compressImage } from '../../utils/imageCompression';
 
 const AdminDataLSP = () => {
   const { filteredMenuItems } = useMenu('admin');
@@ -74,14 +75,15 @@ const AdminDataLSP = () => {
     setModalOpen(false);
   };
 
-  const handleChange = (e) => {
+  const handleChange = async (e) => {
     const { name, value, files } = e.target;
     if (name === 'logo' && files && files[0]) {
-      const reader = new FileReader();
-      reader.onload = () => {
-        setFormData((prev) => ({ ...prev, logo: reader.result }));
-      };
-      reader.readAsDataURL(files[0]);
+      try {
+        const compressedFile = await compressImage(files[0]);
+        setFormData((prev) => ({ ...prev, logo: compressedFile }));
+      } catch (error) {
+        setError('Gagal mengompresi gambar');
+      }
     } else {
       setFormData((prev) => ({ ...prev, [name]: value }));
     }
