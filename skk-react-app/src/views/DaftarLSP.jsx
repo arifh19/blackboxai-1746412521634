@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import api from '../services/api';
 import Pagination from '../components/Pagination';
+import Navbar from '../components/Navbar';
+import Footer from '../components/Footer';
 
 const ITEMS_PER_PAGE = 5;
 
@@ -50,6 +52,7 @@ const DaftarLSP = () => {
 
   return (
     <>
+      <Navbar />
       <header className="header-banner" id="home">
         <h2>DAFTAR LSP</h2>
       </header>
@@ -104,6 +107,7 @@ const DaftarLSP = () => {
           </>
         )}
       </div>
+      <Footer />
     </>
   );
 };
