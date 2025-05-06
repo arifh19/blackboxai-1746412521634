@@ -35,7 +35,7 @@ const ProtectedRoute = ({ children, requiredSubject }) => {
   }
 
   if (!user) {
-    return <Navigate to="/login" replace />;
+    return <Navigate to="/skk/login" replace />;
   }
 
   // Check ability for requiredSubject
@@ -44,7 +44,7 @@ const ProtectedRoute = ({ children, requiredSubject }) => {
   );
 
   if (!canAccess) {
-    return <Navigate to="/login" replace />;
+    return <Navigate to="/skk/login" replace />;
   }
 
   return children;
@@ -52,7 +52,7 @@ const ProtectedRoute = ({ children, requiredSubject }) => {
 
 const AppRoutes = () => {
   return (
-    <Router>
+    <Router basename="/skk">
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/tentang-kami" element={<TentangKami />} />
@@ -127,7 +127,7 @@ const AppRoutes = () => {
           }
         />
 
-        <Route path="*" element={<Navigate to="/login" replace />} />
+        <Route path="*" element={<Navigate to="/skk/login" replace />} />
       </Routes>
     </Router>
   );
