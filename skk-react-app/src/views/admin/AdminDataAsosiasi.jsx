@@ -2,10 +2,12 @@ import React, { useEffect, useState } from 'react';
 import api from '../../services/api';
 import DashboardSidebar from '../../components/DashboardSidebar';
 import { useMenu } from '../../navigation/menuManager';
+import Pagination from '../../components/Pagination';
 
 const AdminDataAsosiasi = () => {
   const { filteredMenuItems } = useMenu('admin');
   const [data, setData] = useState([]);
+  const [filteredData, setFilteredData] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [formData, setFormData] = useState({
@@ -16,6 +18,9 @@ const AdminDataAsosiasi = () => {
   });
   const [editingId, setEditingId] = useState(null);
   const [modalOpen, setModalOpen] = useState(false);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [currentPage, setCurrentPage] = useState(1);
+  const ITEMS_PER_PAGE = 5;
 
   const fetchData = async () => {
     setLoading(true);
@@ -23,6 +28,7 @@ const AdminDataAsosiasi = () => {
     try {
       const response = await api.getAsosiasiData();
       setData(response);
+      setFilteredData(response);
     } catch (err) {
       setError('Gagal memuat data Asosiasi');
     } finally {
@@ -33,6 +39,14 @@ const AdminDataAsosiasi = () => {
   useEffect(() => {
     fetchData();
   }, []);
+
+  useEffect(() => {
+    const filtered = data.filter((item) =>
+      item.name.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+    setFilteredData(filtered);
+    setCurrentPage(1);
+  }, [searchTerm, data]);
 
   const openModal = (item = null) => {
     if (item) {
@@ -55,8 +69,16 @@ const AdminDataAsosiasi = () => {
   };
 
   const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
+    const { name, value, files } = e.target;
+    if (name === 'logo' && files && files[0]) {
+      const reader = new FileReader();
+      reader.onload = () => {
+        setFormData((prev) => ({ ...prev, logo: reader.result }));
+      };
+      reader.readAsDataURL(files[0]);
+    } else {
+      setFormData((prev) => ({ ...prev, [name]: value }));
+    }
   };
 
   const handleSubmit = async (e) => {
@@ -86,66 +108,93 @@ const AdminDataAsosiasi = () => {
     }
   };
 
+  // Pagination logic
+  const totalPages = Math.ceil(filteredData.length / ITEMS_PER_PAGE);
+  const currentData = filteredData.slice(
+    (currentPage - 1) * ITEMS_PER_PAGE,
+    currentPage * ITEMS_PER_PAGE
+  );
+
+  const handlePageChange = (page) => {
+    setCurrentPage(page);
+  };
+
   return (
     <div className="flex min-h-screen bg-gray-100">
       <DashboardSidebar menuItems={filteredMenuItems} />
       <div className="flex-1 p-6 bg-white rounded shadow">
         <h2 className="text-xl font-bold mb-4">Data Asosiasi</h2>
         {error && <div className="mb-4 text-red-600">{error}</div>}
-        <button
-          onClick={() => openModal()}
-          className="mb-4 bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
-        >
-          Tambah Data
-        </button>
+        <div className="flex justify-between mb-4">
+          <input
+            type="text"
+            placeholder="Cari nama Asosiasi..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="border p-2 rounded w-1/3"
+          />
+          <button
+            onClick={() => openModal()}
+            className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+          >
+            Tambah Data
+          </button>
+        </div>
         {loading ? (
           <div>Loading...</div>
         ) : (
-          <table className="w-full border-collapse border border-gray-300">
-            <thead>
-              <tr>
-                <th className="border border-gray-300 p-2">Logo</th>
-                <th className="border border-gray-300 p-2">Nama Asosiasi</th>
-                <th className="border border-gray-300 p-2">Matra</th>
-                <th className="border border-gray-300 p-2">Alamat</th>
-                <th className="border border-gray-300 p-2">Aksi</th>
-              </tr>
-            </thead>
-            <tbody>
-              {data.length === 0 ? (
+          <>
+            <table className="w-full border-collapse border border-gray-300">
+              <thead>
                 <tr>
-                  <td colSpan="5" className="text-center p-4">
-                    Tidak ada data
-                  </td>
+                  <th className="border border-gray-300 p-2">Logo</th>
+                  <th className="border border-gray-300 p-2">Nama Asosiasi</th>
+                  <th className="border border-gray-300 p-2">Matra</th>
+                  <th className="border border-gray-300 p-2">Alamat</th>
+                  <th className="border border-gray-300 p-2">Aksi</th>
                 </tr>
-              ) : (
-                data.map((item) => (
-                  <tr key={item.id}>
-                    <td className="border border-gray-300 p-2">
-                      <img src={item.logo} alt="logo" className="w-20 h-auto" />
-                    </td>
-                    <td className="border border-gray-300 p-2">{item.name}</td>
-                    <td className="border border-gray-300 p-2">{item.matra}</td>
-                    <td className="border border-gray-300 p-2">{item.alamat}</td>
-                    <td className="border border-gray-300 p-2">
-                      <button
-                        onClick={() => openModal(item)}
-                        className="bg-yellow-500 text-white px-2 py-1 rounded mr-2 hover:bg-yellow-600"
-                      >
-                        Edit
-                      </button>
-                      <button
-                        onClick={() => handleDelete(item.id)}
-                        className="bg-red-600 text-white px-2 py-1 rounded hover:bg-red-700"
-                      >
-                        Hapus
-                      </button>
+              </thead>
+              <tbody>
+                {currentData.length === 0 ? (
+                  <tr>
+                    <td colSpan="5" className="text-center p-4">
+                      Tidak ada data
                     </td>
                   </tr>
-                ))
-              )}
-            </tbody>
-          </table>
+                ) : (
+                  currentData.map((item) => (
+                    <tr key={item.id}>
+                      <td className="border border-gray-300 p-2">
+                        <img src={item.logo} alt="logo" className="w-20 h-auto" />
+                      </td>
+                      <td className="border border-gray-300 p-2">{item.name}</td>
+                      <td className="border border-gray-300 p-2">{item.matra}</td>
+                      <td className="border border-gray-300 p-2">{item.alamat}</td>
+                      <td className="border border-gray-300 p-2">
+                        <button
+                          onClick={() => openModal(item)}
+                          className="bg-yellow-500 text-white px-2 py-1 rounded mr-2 hover:bg-yellow-600"
+                        >
+                          Edit
+                        </button>
+                        <button
+                          onClick={() => handleDelete(item.id)}
+                          className="bg-red-600 text-white px-2 py-1 rounded hover:bg-red-700"
+                        >
+                          Hapus
+                        </button>
+                      </td>
+                    </tr>
+                  ))
+                )}
+              </tbody>
+            </table>
+            <Pagination
+              totalPages={totalPages}
+              currentPage={currentPage}
+              onPageChange={handlePageChange}
+            />
+          </>
         )}
 
         {modalOpen && (
@@ -154,14 +203,16 @@ const AdminDataAsosiasi = () => {
               <h3 className="text-lg font-bold mb-4">{editingId ? 'Edit Data Asosiasi' : 'Tambah Data Asosiasi'}</h3>
               <form onSubmit={handleSubmit} className="grid grid-cols-1 gap-4">
                 <input
-                  type="text"
+                  type="file"
                   name="logo"
-                  placeholder="Logo URL"
-                  value={formData.logo}
+                  accept="image/*"
                   onChange={handleChange}
                   className="border p-2 rounded"
-                  required
+                  required={!editingId}
                 />
+                {formData.logo && typeof formData.logo === 'string' && (
+                  <img src={formData.logo} alt="Preview" className="w-20 h-auto" />
+                )}
                 <input
                   type="text"
                   name="name"
