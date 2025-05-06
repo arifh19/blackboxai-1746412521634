@@ -4,9 +4,6 @@ const backendUrl = process.env.REACT_APP_BACKEND_URL;
 
 const api = axios.create({
   baseURL: backendUrl,
-  headers: {
-    'Content-Type': 'application/json',
-  },
 });
 
 // Helper to prepare FormData if logo is a File
@@ -22,77 +19,89 @@ const prepareFormData = (data) => {
 };
 
 // LSP API
-const getLSPData = async () => {
-  const response = await api.get('/lsp');
+export const getLSPData = async (accessToken) => {
+  const response = await api.get('/lsp', {
+    headers: { Authorization: `Bearer ${accessToken}` },
+  });
   return response.data;
 };
 
-const createLSP = async (data) => {
+export const createLSP = async (data, accessToken) => {
   const payload = prepareFormData(data);
-  const headers = data.logo instanceof File ? { 'Content-Type': 'multipart/form-data' } : { 'Content-Type': 'application/json' };
+  const headers = data.logo instanceof File ? { 'Content-Type': 'multipart/form-data', Authorization: `Bearer ${accessToken}` } : { Authorization: `Bearer ${accessToken}` };
   const response = await api.post('/lsp', payload, { headers });
   return response.data;
 };
 
-const updateLSP = async (id, data) => {
+export const updateLSP = async (id, data, accessToken) => {
   const payload = prepareFormData(data);
-  const headers = data.logo instanceof File ? { 'Content-Type': 'multipart/form-data' } : { 'Content-Type': 'application/json' };
+  const headers = data.logo instanceof File ? { 'Content-Type': 'multipart/form-data', Authorization: `Bearer ${accessToken}` } : { Authorization: `Bearer ${accessToken}` };
   const response = await api.put(`/lsp/${id}`, payload, { headers });
   return response.data;
 };
 
-const deleteLSP = async (id) => {
-  const response = await api.delete(`/lsp/${id}`);
+export const deleteLSP = async (id, accessToken) => {
+  const response = await api.delete(`/lsp/${id}`, {
+    headers: { Authorization: `Bearer ${accessToken}` },
+  });
   return response.data;
 };
 
 // Asosiasi API
-const getAsosiasiData = async () => {
-  const response = await api.get('/asosiasi');
+export const getAsosiasiData = async (accessToken) => {
+  const response = await api.get('/asosiasi', {
+    headers: { Authorization: `Bearer ${accessToken}` },
+  });
   return response.data;
 };
 
-const createAsosiasi = async (data) => {
+export const createAsosiasi = async (data, accessToken) => {
   const payload = prepareFormData(data);
-  const headers = data.logo instanceof File ? { 'Content-Type': 'multipart/form-data' } : { 'Content-Type': 'application/json' };
+  const headers = data.logo instanceof File ? { 'Content-Type': 'multipart/form-data', Authorization: `Bearer ${accessToken}` } : { Authorization: `Bearer ${accessToken}` };
   const response = await api.post('/asosiasi', payload, { headers });
   return response.data;
 };
 
-const updateAsosiasi = async (id, data) => {
+export const updateAsosiasi = async (id, data, accessToken) => {
   const payload = prepareFormData(data);
-  const headers = data.logo instanceof File ? { 'Content-Type': 'multipart/form-data' } : { 'Content-Type': 'application/json' };
+  const headers = data.logo instanceof File ? { 'Content-Type': 'multipart/form-data', Authorization: `Bearer ${accessToken}` } : { Authorization: `Bearer ${accessToken}` };
   const response = await api.put(`/asosiasi/${id}`, payload, { headers });
   return response.data;
 };
 
-const deleteAsosiasi = async (id) => {
-  const response = await api.delete(`/asosiasi/${id}`);
+export const deleteAsosiasi = async (id, accessToken) => {
+  const response = await api.delete(`/asosiasi/${id}`, {
+    headers: { Authorization: `Bearer ${accessToken}` },
+  });
   return response.data;
 };
 
 // Lemdiklat API
-const getLemdiklatData = async () => {
-  const response = await api.get('/lemdiklat');
+export const getLemdiklatData = async (accessToken) => {
+  const response = await api.get('/lemdiklat', {
+    headers: { Authorization: `Bearer ${accessToken}` },
+  });
   return response.data;
 };
 
-const createLemdiklat = async (data) => {
+export const createLemdiklat = async (data, accessToken) => {
   const payload = prepareFormData(data);
-  const headers = data.logo instanceof File ? { 'Content-Type': 'multipart/form-data' } : { 'Content-Type': 'application/json' };
+  const headers = data.logo instanceof File ? { 'Content-Type': 'multipart/form-data', Authorization: `Bearer ${accessToken}` } : { Authorization: `Bearer ${accessToken}` };
   const response = await api.post('/lemdiklat', payload, { headers });
   return response.data;
 };
 
-const updateLemdiklat = async (id, data) => {
+export const updateLemdiklat = async (id, data, accessToken) => {
   const payload = prepareFormData(data);
-  const headers = data.logo instanceof File ? { 'Content-Type': 'multipart/form-data' } : { 'Content-Type': 'application/json' };
+  const headers = data.logo instanceof File ? { 'Content-Type': 'multipart/form-data', Authorization: `Bearer ${accessToken}` } : { Authorization: `Bearer ${accessToken}` };
   const response = await api.put(`/lemdiklat/${id}`, payload, { headers });
   return response.data;
 };
 
-const deleteLemdiklat = async (id) => {
-  const response = await api.delete(`/lemdiklat/${id}`);
+export const deleteLemdiklat = async (id, accessToken) => {
+  const response = await api.delete(`/lemdiklat/${id}`, {
+    headers: { Authorization: `Bearer ${accessToken}` },
+  });
   return response.data;
 };
 
