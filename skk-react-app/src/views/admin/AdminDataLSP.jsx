@@ -1,11 +1,13 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useContext } from 'react';
 import api from '../../services/api';
 import DashboardSidebar from '../../components/DashboardSidebar';
 import { useMenu } from '../../navigation/menuManager';
 import Pagination from '../../components/Pagination';
+import { AuthContext } from '../../auth/AuthContext';
 
 const AdminDataLSP = () => {
   const { filteredMenuItems } = useMenu('admin');
+  const { user, logoutUser } = useContext(AuthContext);
   const [data, setData] = useState([]);
   const [filteredData, setFilteredData] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -13,7 +15,7 @@ const AdminDataLSP = () => {
   const [formData, setFormData] = useState({
     logo: '',
     name: '',
-    kategori: '',
+    kategori: 'P1',
     asesor: '',
     tuk: '',
     skema: '',
@@ -58,7 +60,7 @@ const AdminDataLSP = () => {
       setFormData({
         logo: '',
         name: '',
-        kategori: '',
+        kategori: 'P1',
         asesor: '',
         tuk: '',
         skema: '',
@@ -123,10 +125,70 @@ const AdminDataLSP = () => {
     setCurrentPage(page);
   };
 
+  // Profile menu state
+  const [profileMenuOpen, setProfileMenuOpen] = useState(false);
+  const toggleProfileMenu = () => {
+    setProfileMenuOpen(!profileMenuOpen);
+  };
+  const handleLogout = () => {
+    logoutUser();
+  };
+
+  const handleChangePassword = () => {
+    // Implement navigation to change password page
+    // For example, using react-router's useNavigate
+  };
+
   return (
     <div className="flex min-h-screen bg-gray-100">
       <DashboardSidebar menuItems={filteredMenuItems} />
       <div className="flex-1 p-6 bg-white rounded shadow">
+        {/* Profile button top right */}
+        <div className="flex justify-end mb-4 relative items-center space-x-3">
+          <div className="w-8 h-8 rounded-full bg-blue-600 text-white flex items-center justify-center font-bold">
+            {user && user.fullName
+              ? user.fullName
+                  .split(' ')
+                  .map((n) => n[0])
+                  .join('')
+                  .toUpperCase()
+              : ''}
+          </div>
+          <button
+            onClick={toggleProfileMenu}
+            className="flex items-center space-x-2 bg-white border rounded px-4 py-2 shadow hover:bg-gray-50 focus:outline-none"
+          >
+            <span>{user ? user.fullName : 'User'}</span>
+            <svg
+              className={`w-4 h-4 transform transition-transform ${
+                profileMenuOpen ? 'rotate-180' : ''
+              }`}
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+            </svg>
+          </button>
+          {profileMenuOpen && (
+            <div className="absolute right-0 mt-2 w-48 bg-white border rounded shadow-lg z-10">
+              <button
+                onClick={handleChangePassword}
+                className="block w-full text-left px-4 py-2 hover:bg-gray-100"
+              >
+                Ganti Password
+              </button>
+              <button
+                onClick={handleLogout}
+                className="block w-full text-left px-4 py-2 hover:bg-gray-100"
+              >
+                Logout
+              </button>
+            </div>
+          )}
+        </div>
+
         <h2 className="text-xl font-bold mb-4">Data LSP</h2>
         {error && <div className="mb-4 text-red-600">{error}</div>}
         <div className="flex justify-between mb-4">
@@ -230,15 +292,17 @@ const AdminDataLSP = () => {
                   className="border p-2 rounded"
                   required
                 />
-                <input
-                  type="text"
+                <select
                   name="kategori"
-                  placeholder="Kategori"
                   value={formData.kategori}
                   onChange={handleChange}
                   className="border p-2 rounded"
                   required
-                />
+                >
+                  <option value="P1">P1</option>
+                  <option value="P2">P2</option>
+                  <option value="P3">P3</option>
+                </select>
                 <input
                   type="number"
                   name="asesor"
