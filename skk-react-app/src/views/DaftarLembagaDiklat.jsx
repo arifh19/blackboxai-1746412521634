@@ -1,45 +1,44 @@
-import React, { useState } from 'react';
-import Navbar from '../components/Navbar';
-import Footer from '../components/Footer';
+import React, { useEffect, useState } from 'react';
+import api from '../services/api';
 import Pagination from '../components/Pagination';
 
-const initialData = [
-  {
-    logo: '/foto/logo stip.png',
-    name: 'SEKOLAH TINGGI ILMU PELAYARAN',
-    matra: 'LAUT',
-    alamat: 'Jalan Marunda Makmur (Jalan Marunda Makmur), Jakarta Utara, Jakarta 14150, Indonesia',
-  },
-  {
-    logo: '/foto/Logo Hino.png',
-    name: 'PT. HINO MOTORS SALES INDONESIA',
-    matra: 'DARAT',
-    alamat: 'Jl. Gatot Subroto Km. 8, 5, Manis Jaya, Jatiuwung, Kota Tangerang, Banten 15111, Indonesia',
-  },
-  {
-    logo: '/foto/logo aviation school.jpeg',
-    name: 'INDONESIA AVIATION SCHOOL',
-    matra: 'UDARA',
-    alamat: 'Wisma Aldiron, lt 013, Jl. Gatot Subroto No.Kav 72, RT.1/RW.4, Pancoran, Kec. Pancoran, Kota Jakarta Selatan, Daerah Khusus Daerah Khusus Ibukota Jakarta, 12780',
-  },
-];
-const ITEMS_PER_PAGE = 2;
+const ITEMS_PER_PAGE = 5;
 
 const DaftarLembagaDiklat = () => {
-
-  const [filterMatra, setFilterMatra] = useState('');
-  const [filterJudul, setFilterJudul] = useState('');
+  const [data, setData] = useState([]);
+  const [filteredData, setFilteredData] = useState([]);
+  const [searchTerm, setSearchTerm] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
 
-  const filteredData = initialData.filter(item => {
-    return (
-      (filterMatra === '' || item.matra === filterMatra) &&
-      (filterJudul === '' || item.name.toLowerCase().includes(filterJudul.toLowerCase()))
+  const fetchData = async () => {
+    setLoading(true);
+    setError('');
+    try {
+      const response = await api.getLemdiklatData();
+      setData(response);
+      setFilteredData(response);
+    } catch (err) {
+      setError('Gagal memuat data Lembaga Diklat');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchData();
+  }, []);
+
+  useEffect(() => {
+    const filtered = data.filter((item) =>
+      item.name.toLowerCase().includes(searchTerm.toLowerCase())
     );
-  });
+    setFilteredData(filtered);
+    setCurrentPage(1);
+  }, [searchTerm, data]);
 
   const totalPages = Math.ceil(filteredData.length / ITEMS_PER_PAGE);
-
   const currentData = filteredData.slice(
     (currentPage - 1) * ITEMS_PER_PAGE,
     currentPage * ITEMS_PER_PAGE
@@ -49,73 +48,58 @@ const DaftarLembagaDiklat = () => {
     setCurrentPage(page);
   };
 
-  const handleFilterMatraChange = (e) => {
-    setFilterMatra(e.target.value);
-    setCurrentPage(1);
-  };
-
-  const handleFilterJudulChange = (e) => {
-    setFilterJudul(e.target.value);
-    setCurrentPage(1);
-  };
-
   return (
     <>
-      <Navbar />
       <header className="header-banner" id="home">
         <h2>DAFTAR LEMBAGA DIKLAT</h2>
       </header>
 
       <section className="filter-section">
-        <select
-          id="filter-matra"
-          value={filterMatra}
-          onChange={handleFilterMatraChange}
-        >
-          <option value="">-- Matra --</option>
-          <option value="Darat">Darat</option>
-          <option value="Laut">Laut</option>
-          <option value="Udara">Udara</option>
-        </select>
         <input
           type="text"
-          id="filter-judul"
-          placeholder="Cari"
-          value={filterJudul}
-          onChange={handleFilterJudulChange}
+          placeholder="Cari nama Lembaga Diklat..."
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          className="border p-2 rounded mb-4 w-1/3"
         />
       </section>
 
       <div style={{ marginLeft: '50px', marginRight: '50px' }}>
-        <table id="dataTable" border="1">
-          <thead>
-            <tr>
-              <th>Logo Lembaga Diklat</th>
-              <th>Nama Lembaga Diklat</th>
-              <th>Matra</th>
-              <th>Alamat</th>
-            </tr>
-          </thead>
-          <tbody>
-            {currentData.length > 0 ? (
-              currentData.map((item, index) => (
-                <tr key={index}>
-                  <td><img src={item.logo} alt="logo" width="90" /></td>
-                  <td>{item.name}</td>
-                  <td>{item.matra}</td>
-                  <td>{item.alamat}</td>
+        {error && <div className="text-red-600 mb-4">{error}</div>}
+        {loading ? (
+          <div>Loading...</div>
+        ) : (
+          <>
+            <table id="dataTable" border="1" className="w-full border-collapse border border-gray-300">
+              <thead>
+                <tr>
+                  <th>Logo Lembaga Diklat</th>
+                  <th>Nama Lembaga Diklat</th>
+                  <th>Matra</th>
+                  <th>Alamat</th>
                 </tr>
-              ))
-            ) : (
-              <tr>
-                <td colSpan="4" className="text-center p-4">Data tidak ditemukan</td>
-              </tr>
-            )}
-          </tbody>
-        </table>
-        <Pagination totalPages={totalPages} currentPage={currentPage} onPageChange={handlePageChange} />
+              </thead>
+              <tbody>
+                {currentData.length > 0 ? (
+                  currentData.map((item, index) => (
+                    <tr key={index}>
+                      <td><img src={item.logo} alt="logo" width="90" /></td>
+                      <td>{item.name}</td>
+                      <td>{item.matra}</td>
+                      <td>{item.alamat}</td>
+                    </tr>
+                  ))
+                ) : (
+                  <tr>
+                    <td colSpan="4" className="text-center p-4">Data tidak ditemukan</td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+            <Pagination totalPages={totalPages} currentPage={currentPage} onPageChange={handlePageChange} />
+          </>
+        )}
       </div>
-      <Footer />
     </>
   );
 };
