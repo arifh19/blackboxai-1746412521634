@@ -1,4 +1,4 @@
-import React, { useState, useContext } from 'react';
+import React, { useState, useContext, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { AuthContext } from './AuthContext';
 
@@ -6,28 +6,27 @@ const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
-  const { loginUser, user } = useContext(AuthContext);
+  const { loginUser, user, authTokens } = useContext(AuthContext);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    if (authTokens && user) {
+      const canManageAll = user.ability && user.ability.some(
+        (a) => a.action === 'manage' && a.subject === 'all'
+      );
+      if (canManageAll && user.role === 'admin') {
+        navigate('/admin-dashboard');
+      } else {
+        navigate('/user-dashboard');
+      }
+    }
+  }, [user, authTokens, navigate]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
     const success = await loginUser(email, password);
-    if (success) {
-      if (user && user.ability) {
-        const canManageAll = user.ability.some(
-          (a) => a.action === 'manage' && a.subject === 'all'
-        );
-        if (canManageAll) {
-          navigate('/admin-dashboard');
-        } else {
-          navigate('/user-dashboard');
-        }
-      } else {
-        // fallback if user or ability is not yet loaded
-        navigate('/user-dashboard');
-      }
-    } else {
+    if (!success) {
       setError('Login gagal. Periksa email dan password Anda.');
     }
   };
